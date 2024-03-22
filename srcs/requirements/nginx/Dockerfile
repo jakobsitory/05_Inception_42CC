@@ -1,31 +1,28 @@
-FROM alpine:3.19
+# Use debian:bookworm as the base image
+FROM debian:bookworm-slim
 
-# INSTALL NECESSARY PACKAGES
-RUN apk update; \
-	apk upgrade; \
-	apk add nginx; \
-	apk add vim; \
-	apk add openssl; \
-	apk add curl
+# Update the package lists
+RUN apt-get update && apt-get upgrade 
 
-# CONFIGURE SSL/TLS
-RUN mkdir -p /etc/nginx/ssl; \ 
-	openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=login.42.fr/UID=login"
+# Install NGINX & OpenSSL
+RUN apt-get install -y nginx && \
+	apt-get install -y openssl
 
-# CONFIGURE ACCESS RIGHTS
-RUN mkdir -p /var/run/nginx
-RUN mkdir -p /var/www/html
-RUN	chmod 755 /var/www/html
-# RUN addgroup -S www-data
-RUN adduser -S www-data -G www-data
-RUN	chown -R www-data:www-data /var/www/html 
+# Remove the default NGINX configuration
+RUN rm /etc/nginx/nginx.conf
 
-# LAUNCH NGINX IN FOREGROUND
-CMD [ "nginx", "-g", "daemon off;" ]
+# Copy the custom NGINX configuration
+COPY /conf/nginx.conf /etc/nginx/nginx.conf
 
-# COPY CONFIG TO NGINX
-COPY conf/nginx.conf /etc/nginx/nginx.conf
+# Create Direction to store and Generate SSL/TLS Certificate
+RUN mkdir /etc/nginx/ssl
+RUN	openssl req -x509 -nodes -newkey rsa:4096 \
+		-keyout /etc/nginx/ssl/nginx.key \
+		-out /etc/nginx/ssl/nginx.crt -days 365 \
+		-subj "/C=DE/=Berlin/O=42/OU=Berlin/CN=jschott.42.fr/UID=login"
 
-# EXPOSED
+# Expose port 443 for HTTP traffic
+EXPOSE 443
 
-# ENTRYPOINT
+# Command to start NGINX
+CMD ["nginx", "-g", "daemon off;"]

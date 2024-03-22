@@ -1,19 +1,28 @@
-# FROM alpine:3.19
+FROM debian:bookworm-slim
 
 # INSTALL NECESSARY PACKAGES
-# RUN apk update; \
-	# apk upgrade; \
-	# apk add mysql; \
-	# apk add openrc
+RUN apt-get update -y &&\
+	apt-get upgrade -y && \
+	apt-get install -y mariadb-server
 
+# MkDir for socket and grant rights to mysql user
+RUN mkdir -p /run/mysqld / && \
+	chown -R mysql:mysql /run/mysqld/
 
-FROM debian:bookworm
-
-# INSTALL NECESSARY PACKAGES
-RUN apt-get update -y;\
-	apt-get upgrade -y; \
-	apt-get install mariadb-server -y
-
+# Copy custom MariaDB configuration
 COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
-# CMD "./tools/setup.sh"
+
+COPY tools/setup.sh /setup.sh
+RUN chmod -R +x /setup.sh
+RUN /setup.sh
+
+
+# START MARIADB
+# RUN service mariadb start
+
+EXPOSE 3306
+
+# Start maria db
+# CMD ["mysqld_safe"]
+# CMD ["mysqld", "--user=mysql", "--console"]
