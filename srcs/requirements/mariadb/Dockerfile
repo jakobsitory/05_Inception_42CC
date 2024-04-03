@@ -19,9 +19,12 @@ RUN /setup.sh
 
 
 # START MARIADB
-# RUN service mariadb start
+RUN service mariadb start
 
 EXPOSE 3306
+
+# ENTRYPOINT ["/setup.sh"]
+CMD ["mysqld", "--user=mysql", "--console"]
 
 # Start maria db
 # CMD ["mysqld_safe"]
