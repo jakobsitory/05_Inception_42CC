@@ -3,11 +3,9 @@ FROM debian:bookworm-slim
 
 # Install necessary packages (NGINX, PHP, MariaDB, WordPress dependencies)
 RUN apt-get update && \
-    apt-get install -y php-fpm php-mysql mariadb-client curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y php-fpm php-mysql mariadb-client curl
 
-# Copy NGINX configuration file
+# Copy PHP-FPM configuration file
 COPY conf/www.conf /etc/php/8.2/fpm/pool.d/
 
 #Create the folder to enable php start
@@ -20,12 +18,21 @@ RUN mkdir -p /var/www/html && \
     rm wordpress.tar.gz && \   
 	chown -R root:root /var/www/html
 
+
 # Expose ports
 EXPOSE 9000
 
 # Copy startup script
 COPY tools/startup.sh /startup.sh
 RUN chmod +x startup.sh
+
+
+# Copy Wordpress config file
+COPY conf/wp-config.php /var/www/html/wordpress/
+RUN ls /var/www/html/wordpress/
+COPY conf/wp-config.php /var/www/html/
+RUN ls /var/www/html/
+
 
 # Set entrypoint
 ENTRYPOINT ["/startup.sh"]
