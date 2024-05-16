@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
 # INSTALL NECESSARY PACKAGES
 RUN apt-get update -y &&\
@@ -9,23 +9,24 @@ RUN apt-get update -y &&\
 RUN mkdir -p /run/mysqld / && \
 	chown -R mysql:mysql /run/mysqld/
 
+
 # Copy custom MariaDB configuration
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/
 
-
+# Copy Database Configuration
 COPY tools/setup.sh /setup.sh
-RUN chmod -R +x /setup.sh
-RUN /setup.sh
+RUN chmod -R +x /setup.sh && /setup.sh
 
 
 # START MARIADB
-RUN service mariadb start
+# RUN service mariadb start
 
 EXPOSE 3306
 
 # ENTRYPOINT ["/setup.sh"]
+# CMD ["mysqld"]
 CMD ["mysqld", "--user=mysql", "--console"]
 
 # Start maria db
-# CMD ["mysqld_safe"]
-# CMD ["mysqld", "--user=mysql", "--console"]
+# CMD ["mysqld_safe", "--bind.address=0.0.0.0"]
+# CMD ["mysqld", "--user=jschott", "--console"]

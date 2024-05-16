@@ -1,15 +1,19 @@
 # Use debian:bookworm-slim as the base image
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
 # Install necessary packages (NGINX, PHP, MariaDB, WordPress dependencies)
 RUN apt-get update && \
-    apt-get install -y php-fpm php-mysql mariadb-client curl
+	apt-get install -y \
+			php-fpm \
+			php-mysql \
+			mariadb-client \
+			curl
 
 # Copy PHP-FPM configuration file
-COPY conf/www.conf /etc/php/8.2/fpm/pool.d/
+COPY conf/www.conf /etc/php/7.4/fpm/pool.d/
 
 #Create the folder to enable php start
-# RUN mkdir /run/php
+RUN mkdir /run/php
 
 # Set up WordPress
 RUN mkdir -p /var/www/html && \
@@ -18,7 +22,6 @@ RUN mkdir -p /var/www/html && \
     rm wordpress.tar.gz && \   
 	chown -R root:root /var/www/html
 
-
 # Expose ports
 EXPOSE 9000
 
@@ -26,15 +29,8 @@ EXPOSE 9000
 COPY tools/startup.sh /startup.sh
 RUN chmod +x startup.sh
 
-
 # Copy Wordpress config file
-COPY conf/wp-config.php /var/www/html/wordpress/
-RUN ls /var/www/html/wordpress/
-COPY conf/wp-config.php /var/www/html/
-RUN ls /var/www/html/
-
+COPY conf/wp-config.php /var/www/html/wordpress/wp-config.php
 
 # Set entrypoint
 ENTRYPOINT ["/startup.sh"]
-# ENTRYPOINT ["service", "php8.2-fpm", "start"]
-# CMD ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html/wordpress"]

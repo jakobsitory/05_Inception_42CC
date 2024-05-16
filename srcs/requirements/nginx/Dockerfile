@@ -1,12 +1,12 @@
 # Use debian:bookworm as the base image
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
 # Update the package lists
-RUN apt-get update && apt-get upgrade -y
-
-# Install NGINX & OpenSSL
-RUN apt-get install -y nginx && \
-	apt-get install -y openssl
+RUN apt-get update && \
+	apt-get upgrade -y && \
+	apt-get install -y \
+			nginx \
+			openssl
 
 # Remove the default NGINX configuration
 RUN rm /etc/nginx/nginx.conf
@@ -22,6 +22,7 @@ RUN	openssl req -x509 -nodes -newkey rsa:4096 \
 		-subj "/C=DE/=Berlin/O=42/OU=Berlin/CN=jschott.42.fr/UID=login"
 
 # Expose port 443 for HTTP traffic
+# EXPOSE 443 
 EXPOSE 8080
 
 # Command to start NGINX
