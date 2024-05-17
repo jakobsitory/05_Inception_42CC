@@ -22,8 +22,7 @@ RUN	openssl req -x509 -nodes -newkey rsa:4096 \
 		-subj "/C=DE/=Berlin/O=42/OU=Berlin/CN=jschott.42.fr/UID=login"
 
 # Expose port 443 for HTTP traffic
-# EXPOSE 443 
-EXPOSE 8080
+EXPOSE 443
 
 # Command to start NGINX
 CMD ["nginx", "-g", "daemon off;"]

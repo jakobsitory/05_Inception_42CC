@@ -9,24 +9,16 @@ RUN apt-get update -y &&\
 RUN mkdir -p /run/mysqld / && \
 	chown -R mysql:mysql /run/mysqld/
 
-
 # Copy custom MariaDB configuration
 COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/
 
+ENV MARIADB_DATABASE=$MARIADB_DATABASE \
+	MARIADB_USER=$MARIADB_USER \
+	MARIADB_PASSWORD=$MARIADB_PASSWORD \
+	MARIADB_ROOT_PASSWORD=$MARIADB_ROOT_PASSWORD
+
 # Copy Database Configuration
 COPY tools/setup.sh /setup.sh
-RUN chmod -R +x /setup.sh && /setup.sh
+RUN chmod -R +x /setup.sh
 
-
-# START MARIADB
-# RUN service mariadb start
-
-EXPOSE 3306
-
-# ENTRYPOINT ["/setup.sh"]
-# CMD ["mysqld"]
-CMD ["mysqld", "--user=mysql", "--console"]
-
-# Start maria db
-# CMD ["mysqld_safe", "--bind.address=0.0.0.0"]
-# CMD ["mysqld", "--user=jschott", "--console"]
+ENTRYPOINT [ "./setup.sh" ]
