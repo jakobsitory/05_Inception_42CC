@@ -16,6 +16,8 @@ Setting up...
 - Ensuring the containers are correctly configured to start, stop, and restart as needed.
 - Demonstrating a deep understanding of Docker, Docker Compose, and container networking.
 
+![](./inception_diagram.png)
+
 
 ## **Key Achievements**
 
